@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>K9 Productions - Pitch Deck</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+
+    <style>
+        /* --- GLOBAL & NAVIGATION STYLES --- */
+        body {
+            background-color: #111;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+        }
+
+        #deck-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .slide-wrapper {
+            display: none;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide-wrapper.active {
+            display: flex;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .nav-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            color: rgba(255, 255, 255, 0.5);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 14px;
+            z-index: 9999;
+        }
+
+        /* --- SHARED STYLES --- */
+        .slide-container {
+            width: 1280px;
+            height: 720px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
+
+        .display-font, .hero-title, .prime-title, .client-title {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Slide Specific Tweaks */
+        .hero-title { font-size: 150px; line-height: 0.85; letter-spacing: -0.04em; font-weight: 700; }
+        .outline-text { color: transparent; -webkit-text-stroke: 3px white; }
+        
+        .tension-title { font-size: 56px; line-height: 1; font-weight: 700; letter-spacing: -0.02em; text-transform: uppercase; margin-bottom: 24px; color: #ffffff; }
+        .tension-desc { font-size: 18px; line-height: 1.6; color: #9ca3af; font-weight: 300; }
+        .accent-line { height: 2px; background-color: #ffffff; width: 40px; margin-bottom: 30px; }
+
+        .marker-number { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; color: #000; border: 1px solid #000; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; margin-right: 24px; margin-top: 12px; }
+
+        .service-card { border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease; height: 100%; display: flex; flex-direction: column; padding: 24px; position: relative; background-color: rgba(255,255,255,0.02); }
+        .service-title { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 600; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: space-between; align-items: center; }
+        .service-list li { font-size: 15px; line-height: 1.6; color: #a3a3a3; margin-bottom: 8px; display: flex; align-items: flex-start; }
+        .service-list li::before { content: "•"; color: #ffffff; font-weight: bold; display: inline-block; width: 1em; margin-left: -1em; }
+        .service-list { padding-left: 1em; }
+        .quadrant-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 16px; height: 100%; }
+
+        .reason-col { position: relative; transition: all 0.3s ease; display: flex; flex-direction: column; justify-content: space-between; }
+        .reason-number { font-family: 'Space Grotesk', sans-serif; font-size: 140px; line-height: 0.8; font-weight: 700; color: #f3f4f6; position: absolute; top: -20px; left: -10px; z-index: 0; letter-spacing: -0.05em; }
+        .reason-content { position: relative; z-index: 10; }
+        .vertical-divider { width: 1px; background-color: #e5e5e5; height: 100%; }
+        .highlight-bar { width: 0; height: 4px; background-color: #000; transition: width 0.3s ease; margin-bottom: 24px; }
+        .reason-col:nth-child(3) .highlight-bar { width: 60px; }
+        .reason-col:hover .highlight-bar { width: 100%; }
+
+        .step-card { position: relative; z-index: 10; transition: all 0.3s ease; height: 100%; display: flex; flex-direction: column; }
+        .step-number-process { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; color: #000; background-color: #fff; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; margin-bottom: 24px; position: relative; z-index: 20; }
+        .step-card:hover .step-number-process { transform: scale(1.1); }
+        .connector-line-process { position: absolute; top: 16px; left: 32px; right: -20px; height: 1px; background-color: rgba(255,255,255,0.2); z-index: 0; }
+        .step-card:last-child .connector-line-process { display: none; }
+        .step-arrow-process { position: absolute; right: -10px; top: 11px; font-size: 10px; color: rgba(255,255,255,0.2); z-index: 1; }
+        .step-card:last-child .step-arrow-process { display: none; }
+
+        .case-card { background-color: #ffffff; border: 1px solid #e5e7eb; padding: 20px; display: flex; flex-direction: column; transition: all 0.3s ease; position: relative; height: 100%; }
+        .case-card:hover { border-color: #000000; transform: translateY(-2px); box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1); z-index: 10; }
+        .card-header { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #f3f4f6; }
+        .challenge-block { margin-bottom: 12px; }
+        .solution-block { margin-top: auto; background-color: #f9fafb; margin: 0 -20px -20px -20px; padding: 16px 20px; border-top: 1px solid #f3f4f6; }
+
+        .cap-card { background-color: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); padding: 24px; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.3s ease; position: relative; overflow: hidden; }
+        .cap-card:hover { background-color: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.3); transform: translateY(-4px); }
+        .cap-icon-wrapper { width: 48px; height: 48px; border-radius: 50%; background-color: rgba(255, 255, 255, 0.05); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; transition: all 0.3s ease; }
+        .cap-card:hover .cap-icon-wrapper { background-color: #ffffff; color: #000000; }
+        .grid-layout { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); gap: 20px; height: 100%; }
+
+        .impact-col { border-right: 1px solid #e5e7eb; transition: all 0.3s ease; position: relative; }
+        .impact-col:last-child { border-right: none; }
+        .impact-col:hover { background-color: #fafafa; }
+        .impact-number { font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: #9ca3af; margin-bottom: 24px; display: inline-block; border: 1px solid #e5e7eb; padding: 4px 8px; border-radius: 4px; }
+        .impact-stat { background-color: #000000; color: #ffffff; padding: 16px; margin-top: auto; position: relative; transform: translateY(100%); opacity: 0; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .impact-col:hover .impact-stat { transform: translateY(0); opacity: 1; }
+        .top-accent { position: absolute; top: 0; left: 0; width: 0; height: 4px; background-color: #000; transition: width 0.4s ease; }
+        .impact-col:hover .top-accent { width: 100%; }
+
+        .prime-card { background-color: #000000; color: #ffffff; transition: all 0.4s ease; position: relative; overflow: hidden; }
+        .client-card { background-color: #ffffff; border: 1px solid #e5e7eb; transition: all 0.3s ease; position: relative; display: flex; flex-direction: column; justify-content: center; }
+        .client-card:hover { border-color: #000000; transform: translateX(-4px); z-index: 10; }
+        .service-pill { font-size: 11px; padding: 4px 10px; border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; margin-right: 6px; display: inline-block; color: rgba(255,255,255,0.8); }
+        .service-pill-dark { font-size: 11px; padding: 4px 10px; border: 1px solid #e5e7eb; border-radius: 20px; margin-right: 6px; display: inline-block; color: #6b7280; }
+
+        /* Team Card Compressed for Visibility */
+        .team-card { border-left: 1px solid #e5e7eb; padding: 20px; display: flex; flex-direction: column; transition: all 0.3s ease; position: relative; height: 100%; background: rgba(255,255,255,0.5); }
+        .team-card:first-child { border-left: none; padding-left: 0; }
+        .team-card:hover { background: #ffffff; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.05); z-index: 10; transform: translateY(-4px); }
+        .avatar-placeholder { width: 40px; height: 40px; background-color: #000000; color: #ffffff; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 16px; margin-bottom: 12px; border-radius: 50%; }
+        
+        .audience-card { border: 1px solid #000000; background-color: #ffffff; position: relative; padding: 32px; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); height: 100%; }
+        .audience-card::after { content: ''; position: absolute; top: 8px; left: 8px; width: 100%; height: 100%; background-color: #f3f4f6; z-index: -1; transition: all 0.3s ease; }
+        .audience-card:hover { transform: translate(-4px, -4px); }
+        .audience-card:hover::after { transform: translate(8px, 8px); background-color: #000000; }
+        .icon-box { width: 56px; height: 56px; background-color: #000000; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .tag-label { font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 6px 12px; border: 1px solid #000000; border-radius: 50px; margin-left: auto; }
+
+        .statement-line { border-left: 1px solid rgba(255,255,255,0.2); padding-left: 32px; margin-bottom: 48px; position: relative; transition: all 0.4s ease; }
+        .statement-line:hover { border-left-color: #ffffff; padding-left: 40px; }
+        .bg-typo { position: absolute; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 300px; line-height: 1; color: rgba(255,255,255,0.02); z-index: 0; bottom: -60px; right: -40px; pointer-events: none; }
+        .loading-bar-container { width: 100%; height: 2px; background-color: rgba(255,255,255,0.1); margin-top: 16px; position: relative; overflow: hidden; }
+        .loading-bar { position: absolute; top: 0; left: 0; height: 100%; width: 40%; background-color: #ffffff; }
+
+        .partner-badge { display: inline-flex; align-items: center; padding: 8px 16px; background-color: #000000; color: #ffffff; border-radius: 50px; font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 32px; }
+        .step-container { display: flex; align-items: flex-start; justify-content: space-between; position: relative; margin-top: auto; padding-top: 48px; border-top: 1px solid #e5e7eb; }
+        .step-item { position: relative; width: 22%; z-index: 10; }
+        .step-icon-white { margin-bottom: 16px; font-size: 20px; color: #000000; background: #f3f4f6; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+
+        .contact-card { padding: 32px; border: 1px solid #e5e7eb; background-color: #ffffff; transition: all 0.3s ease; height: 100%; display: flex; flex-direction: column; justify-content: space-between; }
+        .contact-card:hover { border-color: #000000; transform: translateY(-4px); box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1); }
+        .icon-circle-contact { width: 48px; height: 48px; border-radius: 50%; background-color: #f3f4f6; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 24px; transition: all 0.3s ease; }
+        .contact-card:hover .icon-circle-contact { background-color: #000000; color: #ffffff; }
+    </style>
+</head>
+<body>
+
+    <div class="slide-counter">SLIDE <span id="current-slide-num">1</span> / 16</div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()"><i class="fa-solid fa-chevron-left"></i></button>
+        <button class="nav-btn" onclick="nextSlide()"><i class="fa-solid fa-chevron-right"></i></button>
+    </div>
+
+    <div id="deck-container">
+
+        <div class="slide-wrapper active bg-gray-800">
+            <div class="slide-container p-16" style="background-color: #050505; color: #ffffff;">
+                <div class="absolute inset-0 z-0 pointer-events-none" style="background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px); background-size: 40px 40px;"></div>
+                <div class="flex justify-between items-start w-full border-b border-gray-800 pb-6 mb-auto z-10">
+                    <div><p class="text-xs text-gray-400 uppercase tracking-[0.2em] font-medium">Agency Pitch Deck</p></div>
+                    <div class="text-right"><p class="text-xs text-gray-400 uppercase tracking-[0.2em] font-medium">K9 Media Solutions • India</p></div>
+                </div>
+                <div class="flex flex-col justify-center items-start mb-auto z-10 relative pl-4">
+                    <h1 class="hero-title text-white mb-8">K9<br/><span class="outline-text">PRODUCTIONS</span></h1>
+                    <div class="flex items-start space-x-8 mt-4 border-l-4 border-white pl-8 py-2">
+                        <div class="flex flex-col">
+                            <p class="text-2xl font-light text-gray-200 max-w-2xl leading-tight font-sans">Creative, Advertising, Digital Marketing &amp; Production Agency</p>
+                            <p class="text-sm text-gray-500 mt-3 font-mono">EST. INDIA</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="absolute -right-20 top-1/4 w-96 h-96 bg-gray-900 rounded-full mix-blend-screen filter blur-3xl opacity-30 z-0"></div>
+                <div class="flex justify-between items-end w-full border-t border-gray-800 pt-6 mt-8 z-10">
+                    <div class="text-xs text-gray-600 font-mono"><p>CONFIDENTIAL • 2025</p></div>
+                    <div class="flex flex-col items-end"><p class="text-xl font-medium text-white italic font-serif opacity-90">“We believe in making trends, not following them.”</p></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-wrapper bg-gray-100">
+            <div class="slide-container p-16" style="background-color: #ffffff; color: #000000;">
+                <div class="absolute inset-0 z-0 pointer-events-none" style="background-image: radial-gradient(#e5e5e5 1px, transparent 1px); background-size: 20px 20px;"></div>
+                <div class="flex justify-between items-center w-full border-b border-gray-200 pb-4 mb-12 z-10 relative">
+                    <div><p class="text-xs text-gray-500 uppercase tracking-[0.2em] font-medium">K9 Productions</p></div>
+                    <div class="flex items-center space-x-2"><div class="h-2 w-2 bg-black rounded-full"></div><p class="text-xs text-black uppercase tracking-[0.2em] font-bold">About Us</p></div>
+                </div>
+                <div class="flex flex-1 z-10 relative">
+                    <div class="w-1/3 flex flex-col justify-start pr-8">
+                        <h2 class="display-font text-7xl font-bold leading-none tracking-tighter uppercase">Who<br/>We<br/>Are</h2>
+                        <div class="mt-8 w-16 h-1 bg-black"></div>
+                    </div>
+                    <div class="w-2/3 flex flex-col justify-center pl-12 border-l border-gray-200">
+                        <div class="relative">
+                            <p class="absolute -top-10 -left-6 text-8xl text-gray-100 font-serif z-0">“</p>
+                            <p class="text-3xl font-light leading-snug text-gray-900 relative z-10 max-w-3xl">K9 Productions is a <span class="font-semibold text-black">creative-led advertising and production agency</span> that helps brands build attention, relevance, and growth.</p>
+                            <p class="text-xl text-gray-600 mt-8 leading-relaxed max-w-2xl font-light">We combine strong ideas, high-quality content, and execution that understands modern culture to separate signals from the noise.</p>
+                            <div class="flex gap-4 mt-10">
+                                <span class="px-4 py-2 border border-gray-300 rounded-full text-xs font-medium uppercase tracking-wider text-gray-600">Strategy</span>
+                                <span class="px-4 py-2 border border-gray-300 rounded-full text-xs font-medium uppercase tracking-wider text-gray-600">Production</span>
+                                <span class="px-4 py-2 border border-gray-300 rounded-full text-xs font-medium uppercase tracking-wider text-gray-600">Culture</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-auto pt-6 z-10 relative">
+                    <div class="flex items-center justify-end"><p class="text-lg font-serif italic text-gray-800">“We believe in making trends, not following them.”</p></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-wrapper bg-gray-900">
+            <div class="slide-container p-16" style="background-color: #0a0a0a; color: #ffffff;">
+                <div class="absolute inset-0 z-0 pointer-events-none" style="background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px); background-size: 40px 40px;"></div>
+                <div class="flex justify-between items-start w-full border-b border-gray-800 pb-6 mb-8 z-10 relative">
+                    <div><p class="text-xs text-gray-500 uppercase tracking-[0.2em] font-medium">K9 Productions</p></div>
+                    <div class="flex items-center space-x-2"><div class="h-1.5 w-1.5 bg-red-600 rounded-full"></div><p class="text-xs text-white uppercase tracking-[0.2em] font-bold">The Problem</p></div>
+                </div>
+                <div class="z-10 relative mb-16">
+                    <h2 class="display-font text-5xl font-medium text-white tracking-tight">The Problem with <span class="text-gray-500 italic font-serif">Advertising Today</span></h2>
+                </div>
+                <div class="flex flex-1 z-10 relative w-full gap-12">
+                    <div class="flex-1 flex flex-col border-l border-gray-800 pl-8 pt-4">
+                        <p class="text-xs font-mono text-gray-500 mb-6">01</p><div class="accent-line"></div>
+                        <h3 class="display-font tension-title">Noise</h3>
+                        <p class="tension-desc">Feeds are crowded; messages blur. In a saturation economy, simply being present is no longer enough.</p>
+                    </div>
+                    <div class="flex-1 flex flex-col border-l border-gray-800 pl-8 pt-4">
+                        <p class="text-xs font-mono text-gray-500 mb-6">02</p><div class="accent-line"></div>
+                        <h3 class="display-font tension-title">Repetition</h3>
+                        <p class="tension-desc">Same formats, same faces, zero edge. Brands play it safe and copy trends instead of creating them.</p>
+                    </div>
+                    <div class="flex-1 flex flex-col border-l border-gray-800 pl-8 pt-4">
+                        <p class="text-xs font-mono text-gray-500 mb-6">03</p><div class="accent-line"></div>
+                        <h3 class="display-font tension-title">Attention Loss</h3>
+                        <p class="tension-desc">If it doesn’t earn attention, it doesn’t earn results. The modern consumer scrolls past average in milliseconds.</p>
+                    </div>
+                </div>
+                <div class="mt-auto pt-8 z-10 relative flex justify-end items-center">
+                    <p class="text-lg font-serif italic text-gray-400 opacity-80">“We believe in making trends, not following them.”</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-wrapper bg-gray-100">
+            <div class="slide-container p-16" style="background-color: #ffffff; color: #000000;">
+                <div class="absolute inset-0 z-0 pointer-events-none" style="background-image: linear-gradient(#f0f0f0 1px, transparent 1px), linear-gradient(90deg, #f0f0f0 1px, transparent 1px); background-size: 40px 40px;"></div>
+                <div class="flex justify-between items-center w-full border-b border-gray-200 pb-4 mb-12 z-10 relative">
+                    <div><p class="text-xs text-gray-500 uppercase tracking-[0.2em] font-medium">K9 Productions</p></div>
+                    <div class="flex items-center space-x-2"><div class="h-2 w-2 bg-black rounded-full"></div><p class="text-xs text-black uppercase tracking-[0.2em] font-bold">Our Philosophy</p></div>
+                </div>
+                <div class="flex flex-col justify-center flex-1 z-10 pl-8 relative">
+                    <div class="flex items-start mb-10 group"><div class="marker-number">01</div><div class="flex flex-col"><h2 class="display-font text-7xl font-bold leading-none tracking-tight text-black">Culture <span class="font-light text-gray-400 italic font-serif lowercase">over</span> algorithms.</h2></div></div>
+                    <div class="flex items-start mb-10 group"><div class="marker-number">02</div><div class="flex flex-col"><h2 class="display-font text-7xl font-bold leading-none tracking-tight text-black">Ideas <span class="font-light text-gray-400 italic font-serif lowercase">over</span> budgets.</h2></div></div>
+                    <div class="flex items-start group"><div class="marker-number">03</div><div class="flex flex-col"><h2 class="display-font text-7xl font-bold leading-none tracking-tight text-black">Trends are <span class="underline decoration-4 decoration-gray-300 underline-offset-8">created</span>,<br/><span class="text-gray-400 line-through decoration-gray-400 decoration-2">not chased.</span></h2></div></div>
+                </div>
+                <div class="absolute right-0 top-1/2 transform -translate-y-1/2 w-1/3 h-full border-l border-gray-100 flex items-center justify-center pointer-events-none">
+                    <div class="w-64 h-64 border border-gray-200 rounded-full flex items-center justify-center opacity-50"><div class="w-48 h-48 border border-gray-300 rounded-full flex items-center justify-center"><div class="w-32 h-32 bg-gray-50 rounded-full"></div></div></div>
+                </div>
+                <div class="mt-auto pt-6 z-10 relative flex justify-between items-end">
+                    <div class="w-1/3 border-t border-black pt-2"><p class="text-xs font-mono text-gray-500 uppercase">Core Beliefs</p></div>
+                    <div class="flex flex-col items-end"><p class="text-lg font-serif italic text-gray-800 opacity-80">“We believe in making trends, not following them.”</p></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-wrapper bg-black">
+            <div class="slide-container p-12" style="background-color: #050505; color: #ffffff;">
+                <div class="absolute inset-0 z-0 pointer-events-none" style="background-size: 40px 40px; background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);"></div>
+                <div class="flex justify-between items-center w-full border-b border-gray-800 pb-4 mb-8 z-10 relative">
+                    <div><p class="text-xs text-gray-500 uppercase tracking-[0.2em] font-medium">K9 Productions</p></div>
+                    <div class="flex items-center space-x-2"><div class="h-2 w-2 bg-white rounded-full"></div><p class="text-xs text-white uppercase tracking-[0.2em] font-bold">Our Services</p></div>
+                </div>
+                <div class="flex flex-col flex-1 z-10 relative h-full">
+                    <div class="mb-8"><h2 class="display-font text-5xl font-bold text-white tracking-tight">What We <span class="text-gray-500 italic font-serif">Do</span></h2></div>
+                    <div class="quadrant-grid flex-1">
+                        <div class="service-card"><div class="service-title"><span>Creative &amp; Strategy</span><i class="fa-solid fa-lightbulb card-icon" style="opacity: 0.5;"></i></div><ul class="service-list"><li>Brand strategy &amp; positioning</li><li>Campaign ideation &amp; conceptualization</li><li>Creative direction &amp; visual identity</li><li>Copywriting &amp; visual thinking</li></ul></div>
+                        <div class="service-card"><div class="service-title"><span>Production</span><i class="fa-solid fa-video card-icon" style="opacity: 0.5;"></i></div><ul class="service-list grid grid-cols-2 gap-x-4"><li>Product shoots</li><li>Fashion, catalogue &amp; model shoots</li><li>Brand films &amp; commercials</li><li>Documentary &amp; short films</li><li>BTS &amp; behind-the-scenes content</li><li>Podcast shoots &amp; long-form content</li></ul></div>
+                        <div class="service-card"><div class="service-title"><span>Digital &amp; Social</span><i class="fa-solid fa-hashtag card-icon" style="opacity: 0.5;"></i></div><ul class="service-list"><li>Digital marketing strategy</li><li>Social media marketing</li><li>Social media management &amp; community</li><li>Content calendars &amp; posting</li><li>Influencer &amp; internet-first ideas</li></ul></div>
+                        <div class="service-card"><div class="service-title"><span>Growth &amp; Tech</span><i class="fa-solid fa-arrow-trend-up card-icon" style="opacity: 0.5;"></i></div><ul class="service-list"><li>SEO (Search Engine Optimization)</li><li>Website design &amp; development</li><li>Lead generation campaigns</li><li>LMS &amp; school websites</li><li>Performance-focused digital ecosystems</li></ul></div>
+                    </div>
+                </div>
+                <div class="mt-6 z-10 relative flex justify-end"><p class="text-sm font-mono text-gray-600">End-to-End Execution</p></div>
+            </div>
+        </div>
+
+        <div class="slide-wrapper bg-gray-100">
+            <div class="slide-container p-16" style="background-color: #ffffff; color: #000000;">
+                <div class="absolute inset-0 z-0 pointer-events-none" style="background-image: linear-gradient(#f0f0f0 1px, transparent 1px), linear-gradient(90deg, #f0f0f0 1px, transparent 1px); background-size: 20px 20px;"></div>
+                <div class="flex justify-between items-center w-full border-b border-gray-200 pb-4 mb-8 z-10 relative">
+                    <div><p class="text-xs text-gray-500 uppercase tracking-[0.2em] font-medium">K9 Productions</p></div>
+                    <div class="flex items-center space-x-2"><div class="h-2 w-2 bg-black rounded-full"></div><p class="text-xs text-black uppercase tracking-[0.2em] font-bold">Why Us</p></div>
+                </div>
+                <div class="z-10 relative mb-12">
+                    <h2 class="display-font text-6xl font-bold tracking-tight text-black">Why <span class="italic font-serif font-light text-gray-500">K9 Productions?</span></h2>
+                </div>
+                <div class="flex flex-1 z-10 relative h-full w-full">
+                    <div class="reason-col flex-1 pr-8 group"><div class="reason-number group-hover:text-gray-200 transition-colors duration-300">01</div><div class="reason-content pt-20"><div class="highlight-bar w-12 group-hover:w-24"></div><h3 class="display-font text-3xl font-bold mb-4 leading-tight">Founder-Led</h3><p class="text-gray-600 text-lg leading-relaxed font-light">Direct access, decisive energy. You work with the people who make the decisions, not layers of middle management.</p><div class="mt-6 flex items-center text-sm font-medium text-black"><span class="border-b border-black pb-1">Zero Bloat</span></div></div></div>
+                    <div class="vertical-divider"></div>
+                    <div class="reason-col flex-1 px-8 group"><div class="reason-number group-hover:text-gray-200 transition-colors duration-300">02</div><div class="reason-content pt-20"><div class="highlight-bar w-12 group-hover:w-24"></div><h3 class="display-font text-3xl font-bold mb-4 leading-tight">Creative + Production<br/><span class="text-gray-400 font-normal text-2xl">Under One Roof</span></h3><p class="text-gray-600 text-lg leading-relaxed font-light">Fewer hops, stronger outcomes. We don't just dream it; we shoot, edit, and ship it. Strategy and execution sit at the same table.</p><div class="mt-6 flex items-center text-sm font-medium text-black"><span class="border-b border-black pb-1">Seamless Execution</span></div></div></div>
+                    <div class="vertical-divider"></div>
+                    <div class="reason-col flex-1 pl-8 group"><div class="reason-number group-hover:text-gray-200 transition-colors duration-300">03</div><div class="reason-content pt-20"><div class="highlight-bar w-12 group-hover:w-24"></div><h3 class="display-font text-3xl font-bold mb-4 leading-tight">Speed, Quality<br/>&amp; Relevance</h3><p class="text-gray-600 text-lg leading-relaxed font-light">Work that’s fast, sharp, and culturally aware. We move at the speed of the internet to ensure your brand stays part of the conversation.</p><div class="mt-6 flex items-center text-sm font-medium text-black"><span class="border-b border-black pb-1">Culture-First</span></div></div></div>
+                </div>
+                <div class="mt-auto pt-8 z-10 relative border-t border-gray-100 flex justify-between items-end">
+                    <p class="text-xs font-mono text-gray-400 uppercase">The K9 Difference</p>
+                    <p class="text-lg font-serif italic text-gray-800 opacity-90">“We believe in making trends, not following them.”</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-wrapper bg-black">
+            <div class="slide-container p-16" style="background-color: #050505; color: #ffffff;">
+                <div class="absolute inset-0 z-0 pointer-events-none" style="background-size: 40px 40px; background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);"></div>
+                <div class="flex justify-between items-center w-full border-b border-gray-800 pb-4 mb-12 z-10 relative">
+                    <div><p class="text-xs text-gray-500 uppercase tracking-[0.2em] font-medium">K9 Productions</p></div>
+                    <div class="flex items-center space-x-2"><div class="h-2 w-2 bg-white rounded-full"></div><p class="text-xs text-white uppercase tracking-[0.2em] font-bold">Process</p></div>
+                </div>
+                <div class="mb-16 z-10 relative">
+                    <h2 class="display-font text-5xl font-bold text-white tracking-tight">How We <span class="text-gray-500 italic font-serif">Work</span></h2>
+                </div>
+                <div class="flex flex-1 w-full gap-8 z-10 relative">
+                    <div class="step-card flex-1 group"><div class="connector-line-process"></div><i class="fa-solid fa-chevron-right step-arrow-process"></i><div class="step-number-process">1</div><div class="mt-8 px-2"><i class="fa-solid fa-ear-listen step-icon" style="font-size: 24px; color: #ffffff; margin-bottom: 20px; opacity: 0.8;"></i><h3 class="display-font text-3xl font-bold mb-4 text-white group-hover:text-gray-200">Insight</h3><div class="w-12 h-0.5 bg-gray-700 mb-6 group-hover:bg-white transition-colors duration-300"></div><p class="text-gray-400 font-light leading-relaxed text-lg">We listen, learn, and find the tension. We don't guess; we dig deep into culture and data.</p></div></div>
+                    <div class="step-card flex-1 group"><div class="connector-line-process"></div><i class="fa-solid fa-chevron-right step-arrow-process"></i><div class="step-number-process">2</div><div class="mt-8 px-2"><i class="fa-regular fa-lightbulb step-icon" style="font-size: 24px; color: #ffffff; margin-bottom: 20px; opacity: 0.8;"></i><h3 class="display-font text-3xl font-bold mb-4 text-white group-hover:text-gray-200">Idea</h3><div class="w-12 h-0.5 bg-gray-700 mb-6 group-hover:bg-white transition-colors duration-300"></div><p class="text-gray-400 font-light leading-relaxed text-lg">We crack the simplest idea that travels. Concepts that are easy to understand but hard to ignore.</p></div></div>
+                    <div class="step-card flex-1 group"><div class="connector-line-process"></div><i class="fa-solid fa-chevron-right step-arrow-process"></i><div class="step-number-process">3</div><div class="mt-8 px-2"><i class="fa-solid fa-clapperboard step-icon" style="font-size: 24px; color: #ffffff; margin-bottom: 20px; opacity: 0.8;"></i><h3 class="display-font text-3xl font-bold mb-4 text-white group-hover:text-gray-200">Execution</h3><div class="w-12 h-0.5 bg-gray-700 mb-6 group-hover:bg-white transition-colors duration-300"></div><p class="text-gray-400 font-light leading-relaxed text-lg">Agile crews, high craft, platform-native. We produce content designed for where it lives.</p></div></div>
+                    <div class="step-card flex-1 group"><div class="step-number-process">4</div><div class="mt-8 px-2"><i class="fa-solid fa-bullseye step-icon" style="font-size: 24px; color: #ffffff; margin-bottom: 20px; opacity: 0.8;"></i><h3 class="display-font text-3xl font-bold mb-4 text-white group-hover:text-gray-200">Impact</h3><div class="w-12 h-0.5 bg-gray-700 mb-6 group-hover:bg-white transition-colors duration-300"></div><p class="text-gray-400 font-light leading-relaxed text-lg">Measure what matters; iterate for momentum. Real results over vanity metrics.</p></div></div>
+                </div>
+                <div class="mt-auto pt-8 z-10 relative flex justify-between items-end border-t border-gray-800">
+                    <p class="text-xs font-mono text-gray-500 uppercase">The K9 Workflow</p>
+                    <p class="text-lg font-serif italic text-gray-500 opacity-80">“Ideas over budgets.”</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-wrapper bg-gray-100">
+            <div class="slide-container p-12" style="background-color: #ffffff; color: #000000;">
+                <div class="absolute inset-0 z-0 pointer-events-none" style="background-image: linear-gradient(#f3f4f6 1px, transparent 1px), linear-gradient(90deg, #f3f4f6 1px, transparent 1px); background-size: 20px 20px;"></div>
+                <div class="flex justify-between items-center w-full border-b border-gray-200 pb-4 mb-8 z-10 relative">
+                    <div><p class="text-xs text-gray-500 uppercase tracking-[0.2em] font-medium">K9 Productions</p></div>
+                    <div class="flex items-center space-x-2"><div class="h-2 w-2 bg-black rounded-full"></div><p class="text-xs text-black uppercase tracking-[0.2em] font-bold">Selected Work</p></div>
+                </div>
+                <div class="flex justify-between items-end mb-8 z-10 relative">
+                    <h2 class="display-font text-5xl font-bold tracking-tight text-black">Work &amp; <span class="text-gray-400 italic font-serif">Experience</span></h2>
+                    <p class="text-sm font-mono text-gray-500 mb-2">Real Challenges. Real Solutions.</p>
+                </div>
+                <div class="grid grid-cols-3 grid-rows-2 gap-5 flex-1 z-10 relative h-full">
+                    <div class="case-card group"><div class="card-header"><h3 class="client-name font-bold text-xl leading-tight">Hansraj College</h3><p class="client-tag text-xs uppercase text-gray-500 mt-1">Documentary</p></div><div class="challenge-block"><p class="section-label text-xs font-bold uppercase tracking-widest mb-1 text-red-600 flex items-center gap-1"><i class="fa-solid fa-bolt text-xs"></i> Challenge</p><p class="section-text text-sm text-gray-700">Tell a principal’s story with heart, avoiding corporate hierarchy tropes.</p></div><div class="solution-block group-hover:bg-black group-hover:text-white transition-colors duration-300"><p class="section-label text-xs font-bold uppercase tracking-widest mb-1 group-hover:text-gray-300 flex items-center gap-1"><i class="fa-solid fa-check text-xs"></i> Solution</p><p class="section-text text-sm group-hover:text-gray-200">Intimate documentary treatment focused on human-first narrative.</p></div></div>
+                    <div class="case-card group"><div class="card-header"><h3 class="client-name font-bold text-xl leading-tight">NIVED</h3><p class="client-tag text-xs uppercase text-gray-500 mt-1">Social Media &amp; Content</p></div><div class="challenge-block"><p class="section-label text-xs font-bold uppercase tracking-widest mb-1 text-red-600 flex items-center gap-1"><i class="fa-solid fa-bolt text-xs"></i> Challenge</p><p class="section-text text-sm text-gray-700">Build meaningful digital presence from scratch in a crowded niche.</p></div><div class="solution-block group-hover:bg-black group-hover:text-white transition-colors duration-300"><p class="section-label text-xs font-bold uppercase tracking-widest mb-1 group-hover:text-gray-300 flex items-center gap-1"><i class="fa-solid fa-check text-xs"></i> Solution</p><p class="section-text text-sm group-hover:text-gray-200">Clear content pillars, consistent voice, and internet-native formats.</p></div></div>
+                    <div class="case-card group"><div class="card-header"><h3 class="client-name font-bold text-xl leading-tight">AAFT24x7</h3><p class="client-tag text-xs uppercase text-gray-500 mt-1">Podcasts (20+ Episodes)</p></div><div class="challenge-block"><p class="section-label text-xs font-bold uppercase tracking-widest mb-1 text-red-600 flex items-center gap-1"><i class="fa-solid fa-bolt text-xs"></i> Challenge</p><p class="section-text text-sm text-gray-700">High-volume production while maintaining premium broadcast quality.</p></div><div class="solution-block group-hover:bg-black group-hover:text-white transition-colors duration-300"><p class="section-label text-xs font-bold uppercase tracking-widest mb-1 group-hover:text-gray-300 flex items-center gap-1"><i class="fa-solid fa-check text-xs"></i> Solution</p><p class="section-text text-sm group-hover:text-gray-200">Streamlined workflow for guests like Ishant Sharma &amp; Mobikwik MD.</p></div></div>
+                    <div class="case-card group"><div class="card-header"><h3 class="client-name font-bold text-xl leading-tight">Bharti Films / IE</h3><p class="client-tag text-xs uppercase text-gray-500 mt-1">PR Shoots &amp; Production</p></div><div class="challenge-block"><p class="section-label text-xs font-bold uppercase tracking-widest mb-1 text-red-600 flex items-center gap-1"><i class="fa-solid fa-bolt text-xs"></i> Challenge</p><p class="section-text text-sm text-gray-700">Fast-turnaround, broadcast-level delivery with zero room for error.</p></div><div class="solution-block group-hover:bg-black group-hover:text-white transition-colors duration-300"><p class="section-label text-xs font-bold uppercase tracking-widest mb-1 group-hover:text-gray-300 flex items-center gap-1"><i class="fa-solid fa-check text-xs"></i> Solution</p><p class="section-text text-sm group-hover:text-gray-200">Tight crews, newsroom discipline, and premium output standards.</p></div></div>
+                    <div class="case-card group"><div class="card-header"><h3 class="client-name font-bold text-xl leading-tight">10+ Brands</h3><p class="client-tag text-xs uppercase text-gray-500 mt-1">Gaming, Pharmacy, Travel, Food</p></div><div class="challenge-block"><p class="section-label text-xs font-bold uppercase tracking-widest mb-1 text-red-600 flex items-center gap-1"><i class="fa-solid fa-bolt text-xs"></i> Challenge</p><p class="section-text text-sm text-gray-700">Managing diverse categories with a single cohesive content brain.</p></div><div class="solution-block group-hover:bg-black group-hover:text-white transition-colors duration-300"><p class="section-label text-xs font-bold uppercase tracking-widest mb-1 group-hover:text-gray-300 flex items-center gap-1"><i class="fa-solid fa-check text-xs"></i> Solution</p><p class="section-text text-sm group-hover:text-gray-200">Adaptable format systems that scale effectively across categories.</p></div></div>
+                    <div class="case-card group"><div class="card-header"><h3 class="client-name font-bold text-xl leading-tight">Public Personalities</h3><p class="client-tag text-xs uppercase text-gray-500 mt-1">Swara Bhaskar, Neha Mehta</p></div><div class="challenge-block"><p class="section-label text-xs font-bold uppercase tracking-widest mb-1 text-red-600 flex items-center gap-1"><i class="fa-solid fa-bolt text-xs"></i> Challenge</p><p class="section-text text-sm text-gray-700">Capturing authenticity in high-stakes, time-sensitive environments.</p></div><div class="solution-block group-hover:bg-black group-hover:text-white transition-colors duration-300"><p class="section-label text-xs font-bold uppercase tracking-widest mb-1 group-hover:text-gray-300 flex items-center gap-1"><i class="fa-solid fa-check text-xs"></i> Solution</p><p class="section-text text-sm group-hover:text-gray-200">Professional, comfort-first production that resonates with fans.</p></div></div>
+                </div>
+                <div class="mt-4 z-10 relative flex justify-end items-center"><p class="text-xs font-mono text-gray-400 uppercase">Proved in the field</p></div>
+            </div>
+        </div>
+
+        <div class="slide-wrapper bg-black">
+            <div class="slide-container p-12" style="background-color: #050505; color: #ffffff;">
+                <div class="absolute inset-0 z-0 pointer-events-none" style="background-size: 40px 40px; background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);"></div>
+                <div class="flex justify-between items-center w-full border-b border-gray-800 pb-4 mb-8 z-10 relative">
+                    <div><p class="text-xs text-gray-500 uppercase tracking-[0.2em] font-medium">K9 Productions</p></div>
+                    <div class="flex items-center space-x-2"><div class="h-2 w-2 bg-white rounded-full"></div><p class="text-xs text-white uppercase tracking-[0.2em] font-bold">Capabilities</p></div>
+                </div>
+                <div class="flex justify-between items-end mb-8 z-10 relative">
+                    <h2 class="display-font text-5xl font-bold text-white tracking-tight">Production &amp; <span class="text-gray-500 italic font-serif">Content</span></h2>
+                    <p class="text-sm font-mono text-gray-500 mb-2">We shoot. We edit. We ship.</p>
+                </div>
+                <div class="grid-layout flex-1 z-10 relative">
+                    <div class="cap-card group"><div class="corner-accent" style="position: absolute; top: 0; right: 0; width: 0; height: 0; border-style: solid; border-width: 0 40px 40px 0; border-color: transparent #ffffff transparent transparent; opacity: 0; transition: opacity 0.3s ease;"></div><div><div class="cap-icon-wrapper"><i class="fa-solid fa-film cap-icon" style="font-size: 20px;"></i></div><h3 class="cap-title font-bold text-2xl mb-2">Brand Films &amp; Commercials</h3><p class="cap-desc text-sm text-gray-400">High-end TVCs and digital ad films that tell your brand story with cinematic precision.</p></div><div class="mt-4 pt-4 border-t border-gray-800"><p class="text-xs text-gray-500 uppercase tracking-wider">Concept to Screen</p></div></div>
+                    <div class="cap-card group"><div class="corner-accent" style="position: absolute; top: 0; right: 0; width: 0; height: 0; border-style: solid; border-width: 0 40px 40px 0; border-color: transparent #ffffff transparent transparent; opacity: 0; transition: opacity 0.3s ease;"></div><div><div class="cap-icon-wrapper"><i class="fa-solid fa-camera-retro cap-icon" style="font-size: 20px;"></i></div><h3 class="cap-title font-bold text-2xl mb-2">Fashion &amp; Model Shoots</h3><p class="cap-desc text-sm text-gray-400">Editorials, lookbooks, and catalogue productions designed for impact and style.</p></div><div class="mt-4 pt-4 border-t border-gray-800"><p class="text-xs text-gray-500 uppercase tracking-wider">Styling &amp; Direction</p></div></div>
+                    <div class="cap-card group"><div class="corner-accent" style="position: absolute; top: 0; right: 0; width: 0; height: 0; border-style: solid; border-width: 0 40px 40px 0; border-color: transparent #ffffff transparent transparent; opacity: 0; transition: opacity 0.3s ease;"></div><div><div class="cap-icon-wrapper"><i class="fa-solid fa-box-open cap-icon" style="font-size: 20px;"></i></div><h3 class="cap-title font-bold text-2xl mb-2">Product Visuals</h3><p class="cap-desc text-sm text-gray-400">Creative tabletop photography and product videos that drive conversion and desire.</p></div><div class="mt-4 pt-4 border-t border-gray-800"><p class="text-xs text-gray-500 uppercase tracking-wider">E-commerce &amp; Creative</p></div></div>
+                    <div class="cap-card group"><div class="corner-accent" style="position: absolute; top: 0; right: 0; width: 0; height: 0; border-style: solid; border-width: 0 40px 40px 0; border-color: transparent #ffffff transparent transparent; opacity: 0; transition: opacity 0.3s ease;"></div><div><div class="cap-icon-wrapper"><i class="fa-solid fa-video cap-icon" style="font-size: 20px;"></i></div><h3 class="cap-title font-bold text-2xl mb-2">Documentary &amp; Narrative</h3><p class="cap-desc text-sm text-gray-400">Short films and human-centric stories that build deeper emotional connections.</p></div><div class="mt-4 pt-4 border-t border-gray-800"><p class="text-xs text-gray-500 uppercase tracking-wider">Storytelling</p></div></div>
+                    <div class="cap-card group"><div class="corner-accent" style="position: absolute; top: 0; right: 0; width: 0; height: 0; border-style: solid; border-width: 0 40px 40px 0; border-color: transparent #ffffff transparent transparent; opacity: 0; transition: opacity 0.3s ease;"></div><div><div class="cap-icon-wrapper"><i class="fa-solid fa-microphone-lines cap-icon" style="font-size: 20px;"></i></div><h3 class="cap-title font-bold text-2xl mb-2">Podcasts &amp; Long-form</h3><p class="cap-desc text-sm text-gray-400">Multi-cam setups, professional audio, and full production for vodcasts and interviews.</p></div><div class="mt-4 pt-4 border-t border-gray-800"><p class="text-xs text-gray-500 uppercase tracking-wider">Studio &amp; Remote</p></div></div>
+                    <div class="cap-card group"><div class="corner-accent" style="position: absolute; top: 0; right: 0; width: 0; height: 0; border-style: solid; border-width: 0 40px 40px 0; border-color: transparent #ffffff transparent transparent; opacity: 0; transition: opacity 0.3s ease;"></div><div><div class="cap-icon-wrapper"><i class="fa-solid fa-mobile-screen cap-icon" style="font-size: 20px;"></i></div><h3 class="cap-title font-bold text-2xl mb-2">Social &amp; BTS Content</h3><p class="cap-desc text-sm text-gray-400">Vertical video engines, Reels, and behind-the-scenes content that feeds the algorithm.</p></div><div class="mt-4 pt-4 border-t border-gray-800"><p class="text-xs text-gray-500 uppercase tracking-wider">Internet-First</p></div></div>
+                </div>
+                <div class="mt-6 z-10 relative flex justify-end items-center"><p class="text-xs font-mono text-gray-600 uppercase">K9 Productions • Media Division</p></div>
+            </div>
+        </div>
+
+        <div class="slide-wrapper bg-gray-50">
+            <div class="slide-container p-16" style="background-color: #ffffff; color: #000000;">
+                <div class="absolute inset-0 z-0 pointer-events-none" style="background-image: linear-gradient(#f0f0f0 1px, transparent 1px), linear-gradient(90deg, #f0f0f0 1px, transparent 1px); background-size: 20px 20px;"></div>
+                <div class="flex justify-between items-center w-full border-b border-gray-200 pb-4 mb-12 z-10 relative">
+                    <div><p class="text-xs text-gray-500 uppercase tracking-[0.2em] font-medium">K9 Productions</p></div>
+                    <div class="flex items-center space-x-2"><div class="h-2 w-2 bg-black rounded-full"></div><p class="text-xs text-black uppercase tracking-[0.2em] font-bold">Digital Impact</p></div>
+                </div>
+                <div class="mb-12 z-10 relative"><h2 class="display-font text-5xl font-bold tracking-tight text-black">Digital, SEO &amp; <span class="text-gray-400 italic font-serif">Web</span></h2></div>
+                <div class="flex flex-1 z-10 relative h-full w-full border border-gray-200 bg-white">
+                    <div class="impact-col flex-1 p-8 flex flex-col group overflow-hidden"><div class="top-accent"></div><div><span class="impact-number">CASE 01</span><h3 class="client-title">DJI</h3><p class="client-meta"><i class="fa-solid fa-globe text-xs"></i> Global Management Partnership</p><div class="mt-8"><div class="deliverable-item flex items-start mb-4"><i class="fa-solid fa-check check-icon"></i><p class="text-sm text-gray-700">Website refinement &amp; SEO hygiene overhaul for better crawlability.</p></div><div class="deliverable-item flex items-start mb-4"><i class="fa-solid fa-check check-icon"></i><p class="text-sm text-gray-700">Implemented clearer Information Architecture (IA) logic.</p></div><div class="deliverable-item flex items-start mb-4"><i class="fa-solid fa-check check-icon"></i><p class="text-sm text-gray-700">Technical checks &amp; intent-led content strategy.</p></div></div></div><div class="impact-stat"><p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Impact</p><p class="font-bold text-lg">Enhanced technical performance</p></div></div>
+                    <div class="impact-col flex-1 p-8 flex flex-col group overflow-hidden"><div class="top-accent"></div><div><span class="impact-number">CASE 02</span><h3 class="client-title">Westarc</h3><p class="client-meta"><i class="fa-solid fa-bolt text-xs"></i> Performance Optimization</p><div class="mt-8"><div class="deliverable-item flex items-start mb-4"><i class="fa-solid fa-check check-icon"></i><p class="text-sm text-gray-700">Comprehensive SEO &amp; website performance improvements.</p></div><div class="deliverable-item flex items-start mb-4"><i class="fa-solid fa-check check-icon"></i><p class="text-sm text-gray-700">Advanced on-page optimization and schema markup implementation.</p></div><div class="deliverable-item flex items-start mb-4"><i class="fa-solid fa-check check-icon"></i><p class="text-sm text-gray-700">Core Web Vitals &amp; speed optimization.</p></div></div></div><div class="impact-stat"><p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Impact</p><p class="font-bold text-lg">Search ranking growth</p></div></div>
+                    <div class="impact-col flex-1 p-8 flex flex-col group overflow-hidden"><div class="top-accent"></div><div><span class="impact-number">CASE 03</span><h3 class="client-title">Seemax Int. School</h3><p class="client-meta"><i class="fa-solid fa-graduation-cap text-xs"></i> Lead Gen &amp; Web</p><div class="mt-8"><div class="deliverable-item flex items-start mb-4"><i class="fa-solid fa-check check-icon"></i><p class="text-sm text-gray-700">Full website design + lead generation infrastructure setup.</p></div><div class="deliverable-item flex items-start mb-4"><i class="fa-solid fa-check check-icon"></i><p class="text-sm text-gray-700">Simplified funnels and automated enquiry flows.</p></div><div class="deliverable-item flex items-start mb-4"><i class="fa-solid fa-check check-icon"></i><p class="text-sm text-gray-700">Custom reporting dashboards for admission tracking.</p></div></div></div><div class="impact-stat"><p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Impact</p><p class="font-bold text-lg">Automated student enrollment</p></div></div>
+                </div>
+                <div class="mt-8 z-10 relative flex justify-between items-end"><p class="text-xs font-mono text-gray-400 uppercase">Growth &amp; Technology Division</p><p class="text-sm text-gray-500 font-medium">Built for visibility. Engineered for conversion.</p></div>
+            </div>
+        </div>
+
+        <div class="slide-wrapper bg-gray-50">
+            <div class="slide-container p-16" style="background-color: #ffffff; color: #000000;">
+                <div class="absolute inset-0 z-0 pointer-events-none" style="background-image: linear-gradient(#f0f0f0 1px, transparent 1px), linear-gradient(90deg, #f0f0f0 1px, transparent 1px); background-size: 20px 20px;"></div>
+                <div class="flex justify-between items-center w-full border-b border-gray-200 pb-4 mb-10 z-10 relative">
+                    <div><p class="text-xs text-gray-500 uppercase tracking-[0.2em] font-medium">K9 Productions</p></div>
+                    <div class="flex items-center space-x-2"><div class="h-2 w-2 bg-black rounded-full"></div><p class="text-xs text-black uppercase tracking-[0.2em] font-bold">Client Roster</p></div>
+                </div>
+                <div class="flex justify-between items-end mb-8 z-10 relative"><h2 class="display-font text-5xl font-bold tracking-tight text-black">Our <span class="italic font-serif font-light text-gray-500">Recent Clients</span></h2><p class="text-sm font-mono text-gray-500 mb-2">Proof of Trust</p></div>
+                <div class="flex gap-8 flex-1 h-full z-10 relative">
+                    <div class="w-7/12 prime-card p-12 flex flex-col justify-between group"><div class="absolute top-0 right-0 p-12 opacity-10 transform translate-x-10 -translate-y-10 group-hover:translate-x-0 group-hover:translate-y-0 transition-transform duration-700"><i class="fa-solid fa-asterisk text-9xl text-white"></i></div><div><span class="prime-tag" style="background-color: #ffffff; color: #000000; padding: 4px 12px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; display: inline-block; margin-bottom: 24px;">Prime Client</span><h3 class="prime-title" style="font-family: 'Space Grotesk', sans-serif; font-size: 80px; font-weight: 700; letter-spacing: -0.04em; line-height: 0.9; margin-bottom: 16px;">Off<br/>Mint</h3><p class="text-xl text-gray-300 font-light max-w-md mt-6 leading-relaxed">End-to-end brand transformation. Building relevance through culture-first strategy and production.</p></div><div class="border-t border-white border-opacity-20 pt-8"><p class="text-xs text-gray-400 uppercase tracking-widest mb-4">Key Engagements</p><div class="flex flex-wrap gap-2"><span class="service-pill">Catalogue shoot</span><span class="service-pill">Visual Identity</span><span class="service-pill">Content Production</span><span class="service-pill">Digital Growth</span></div></div></div>
+                    <div class="w-5/12 flex flex-col gap-6">
+                        <div class="client-card flex-1 p-8"><div class="flex justify-between items-start"><div><i class="fa-solid fa-school client-icon" style="font-size: 24px; color: #d1d5db; margin-bottom: 16px;"></i><h4 class="client-title">Seemax<br/>Int. School</h4><p class="text-sm text-gray-500 mt-2 font-light">Education &amp; Institution</p></div><i class="fa-solid fa-arrow-right text-gray-300 transform -rotate-45 group-hover:text-black transition-colors"></i></div><div class="mt-auto pt-6"><span class="service-pill-dark">Website</span><span class="service-pill-dark">Lead Gen</span></div></div>
+                        <div class="client-card flex-1 p-8"><div class="flex justify-between items-start"><div><i class="fa-solid fa-utensils client-icon" style="font-size: 24px; color: #d1d5db; margin-bottom: 16px;"></i><h4 class="client-title">The Korean<br/>Table</h4><p class="text-sm text-gray-500 mt-2 font-light">Food, Hospitality &amp; Culture</p></div><i class="fa-solid fa-arrow-right text-gray-300 transform -rotate-45 group-hover:text-black transition-colors"></i></div><div class="mt-auto pt-6"><span class="service-pill-dark">Social Media</span><span class="service-pill-dark">Photography</span></div></div>
+                        <div class="mt-auto pt-2 flex justify-between items-center border-t border-gray-100"><p class="text-xs font-mono text-gray-400 uppercase">Selected Works 2024-2025</p><p class="text-xs font-bold text-black border-b border-black pb-0.5 cursor-pointer">View Full Roster</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-wrapper bg-gray-50">
+            <div class="slide-container p-10 pb-0" style="background-color: #ffffff; color: #000000;">
+                <div class="absolute inset-0 z-0 pointer-events-none" style="background-image: linear-gradient(#f3f4f6 1px, transparent 1px), linear-gradient(90deg, #f3f4f6 1px, transparent 1px); background-size: 20px 20px;"></div>
+                <div class="flex justify-between items-center w-full border-b border-gray-200 pb-4 mb-6 z-10 relative">
+                    <div><p class="text-xs text-gray-500 uppercase tracking-[0.2em] font-medium">K9 Productions</p></div>
+                    <div class="flex items-center space-x-2"><div class="h-2 w-2 bg-black rounded-full"></div><p class="text-xs text-black uppercase tracking-[0.2em] font-bold">Leadership</p></div>
+                </div>
+                <div class="mb-6 z-10 relative"><h2 class="display-font text-5xl font-bold tracking-tight text-black">The <span class="text-gray-400 italic font-serif">Core Team</span></h2></div>
+                <div class="grid grid-cols-5 gap-0 flex-1 z-10 relative mb-4">
+                    <div class="team-card group"><div class="avatar-placeholder group-hover:bg-gray-800 transition-colors">SC</div><p class="role-tag" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #9ca3af; margin-bottom: 12px; font-weight: 600;">Founder &amp; Lead</p><h3 class="member-name font-bold text-2xl leading-tight mb-2">Sambhav<br/>Choudhary</h3><p class="member-title" style="font-size: 13px; font-weight: 500; border-bottom: 1px solid #f3f4f6; padding-bottom: 12px; margin-bottom: 12px;">Strategy • Production • Direction</p><p class="member-bio text-xs text-gray-600 leading-relaxed">Driving the agency's vision. Believes in making trends, not just following them.</p></div>
+                    <div class="team-card group"><div class="avatar-placeholder group-hover:bg-gray-800 transition-colors">BS</div><p class="role-tag" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #9ca3af; margin-bottom: 12px; font-weight: 600;">Co-Founder</p><h3 class="member-name font-bold text-2xl leading-tight mb-2">Bhavya<br/>Singh</h3><p class="member-title" style="font-size: 13px; font-weight: 500; border-bottom: 1px solid #f3f4f6; padding-bottom: 12px; margin-bottom: 12px;">Operations • Business • Execution</p><p class="member-bio text-xs text-gray-600 leading-relaxed">Ensuring every idea is executed with precision and every client relationship thrives.</p></div>
+                    <div class="team-card group"><div class="avatar-placeholder group-hover:bg-gray-800 transition-colors">GS</div><p class="role-tag" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #9ca3af; margin-bottom: 12px; font-weight: 600;">Creative Director</p><h3 class="member-name font-bold text-2xl leading-tight mb-2">Gaurish<br/>Sablok</h3><p class="member-title" style="font-size: 13px; font-weight: 500; border-bottom: 1px solid #f3f4f6; padding-bottom: 12px; margin-bottom: 12px;">Creative Director</p><p class="member-bio text-xs text-gray-600 leading-relaxed">Has worked for brands like Nestlé, Omron, and APL Apollo Steel for digital marketing.</p></div>
+                    <div class="team-card group"><div class="avatar-placeholder group-hover:bg-gray-800 transition-colors">RS</div><p class="role-tag" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #9ca3af; margin-bottom: 12px; font-weight: 600;">Social Media Manager</p><h3 class="member-name font-bold text-2xl leading-tight mb-2">Radhika<br/>Sharma</h3><p class="member-title" style="font-size: 13px; font-weight: 500; border-bottom: 1px solid #f3f4f6; padding-bottom: 12px; margin-bottom: 12px;">Content &amp; Strategy</p><p class="member-bio text-xs text-gray-600 leading-relaxed">Leads social strategy, content planning, and brand voice across all platforms.</p></div>
+                    <div class="team-card group"><div class="avatar-placeholder group-hover:bg-gray-800 transition-colors">VC</div><p class="role-tag" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #9ca3af; margin-bottom: 12px; font-weight: 600;">Tech Lead</p><h3 class="member-name font-bold text-2xl leading-tight mb-2">Varun<br/>Chaudhary</h3><p class="member-title" style="font-size: 13px; font-weight: 500; border-bottom: 1px solid #f3f4f6; padding-bottom: 12px; margin-bottom: 12px;">SEO &amp; Website</p><p class="member-bio text-xs text-gray-600 leading-relaxed">Mastering the technical landscape to ensure maximum visibility and seamless digital performance.</p></div>
+                </div>
+                <div class="extended-banner mt-auto" style="background-color: #000000; color: #ffffff; padding: 24px 40px; margin: 0 -40px 0 -40px; position: relative; z-index: 20;">
+                    <div class="flex items-center justify-between mb-4"><h4 class="display-font text-2xl font-bold text-white">Extended Team</h4><p class="text-xs text-gray-400 uppercase tracking-widest">Built Per Project</p></div>
+                    <div class="flex flex-wrap items-center">
+                        <span class="skill-tag" style="display: inline-flex; align-items: center; font-size: 13px; color: #d1d5db; margin-right: 24px; margin-bottom: 8px;"><span style="display: block; width: 4px; height: 4px; background-color: #ffffff; border-radius: 50%; margin-right: 10px;"></span>SEO Experts</span>
+                        <span class="skill-tag" style="display: inline-flex; align-items: center; font-size: 13px; color: #d1d5db; margin-right: 24px; margin-bottom: 8px;"><span style="display: block; width: 4px; height: 4px; background-color: #ffffff; border-radius: 50%; margin-right: 10px;"></span>Graphic Designers</span>
+                        <span class="skill-tag" style="display: inline-flex; align-items: center; font-size: 13px; color: #d1d5db; margin-right: 24px; margin-bottom: 8px;"><span style="display: block; width: 4px; height: 4px; background-color: #ffffff; border-radius: 50%; margin-right: 10px;"></span>Senior Editors</span>
+                        <span class="skill-tag" style="display: inline-flex; align-items: center; font-size: 13px; color: #d1d5db; margin-right: 24px; margin-bottom: 8px;"><span style="display: block; width: 4px; height: 4px; background-color: #ffffff; border-radius: 50%; margin-right: 10px;"></span>Cinematographers</span>
+                        <span class="skill-tag" style="display: inline-flex; align-items: center; font-size: 13px; color: #d1d5db; margin-right: 24px; margin-bottom: 8px;"><span style="display: block; width: 4px; height: 4px; background-color: #ffffff; border-radius: 50%; margin-right: 10px;"></span>Web Developers</span>
+                        <span class="skill-tag" style="display: inline-flex; align-items: center; font-size: 13px; color: #d1d5db; margin-right: 24px; margin-bottom: 8px;"><span style="display: block; width: 4px; height: 4px; background-color: #ffffff; border-radius: 50%; margin-right: 10px;"></span>Performance Marketers</span>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-4 font-light italic">"We operate with a flexible, master-skilled team scaled to your specific needs."</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-wrapper bg-gray-50">
+            <div class="slide-container p-16" style="background-color: #ffffff; color: #000000;">
+                <div class="absolute inset-0 z-0 pointer-events-none" style="background-image: linear-gradient(#f3f4f6 1px, transparent 1px), linear-gradient(90deg, #f3f4f6 1px, transparent 1px); background-size: 40px 40px;"></div>
+                <div class="flex justify-between items-center w-full border-b border-gray-200 pb-4 mb-10 z-10 relative">
+                    <div><p class="text-xs text-gray-500 uppercase tracking-[0.2em] font-medium">K9 Productions</p></div>
+                    <div class="flex items-center space-x-2"><div class="h-2 w-2 bg-black rounded-full"></div><p class="text-xs text-black uppercase tracking-[0.2em] font-bold">Audience</p></div>
+                </div>
+                <div class="flex justify-between items-end mb-10 z-10 relative"><h2 class="display-font text-5xl font-bold tracking-tight text-black">Who We <span class="text-gray-400 italic font-serif">Work Best With</span></h2><p class="text-sm font-mono text-gray-500 mb-2">Ideal Client Profiles</p></div>
+                <div class="grid grid-cols-2 gap-8 flex-1 z-10 relative mb-4">
+                    <div class="audience-card group"><div class="card-header"><div class="icon-box"><i class="fa-solid fa-rocket"></i></div><span class="tag-label">Growth Phase</span></div><div><h3 class="audience-title">Startups</h3><p class="audience-desc">Founders with momentum and a point of view. We help you scale from seed to series A with brand authority.</p></div><i class="fa-solid fa-arrow-right arrow-icon"></i></div>
+                    <div class="audience-card group"><div class="card-header"><div class="icon-box"><i class="fa-solid fa-bag-shopping"></i></div><span class="tag-label">Consumer First</span></div><div><h3 class="audience-title">D2C &amp; Lifestyle</h3><p class="audience-desc">Brands wanting attention with taste. We create the visual language that turns scrolling into shopping.</p></div><i class="fa-solid fa-arrow-right arrow-icon"></i></div>
+                    <div class="audience-card group"><div class="card-header"><div class="icon-box"><i class="fa-solid fa-utensils"></i></div><span class="tag-label">Experience</span></div><div><h3 class="audience-title">Food &amp; Hospitality</h3><p class="audience-desc">Culture-forward businesses. From cloud kitchens to boutique hotels, we capture the vibe that brings people in.</p></div><i class="fa-solid fa-arrow-right arrow-icon"></i></div>
+                    <div class="audience-card group"><div class="card-header"><div class="icon-box"><i class="fa-solid fa-graduation-cap"></i></div><span class="tag-label">Institutional</span></div><div><h3 class="audience-title">Schools &amp; Institutions</h3><p class="audience-desc">Building trust and enrollment. We modernize legacy institutions with digital-first recruitment funnels.</p></div><i class="fa-solid fa-arrow-right arrow-icon"></i></div>
+                </div>
+                <div class="mt-auto z-10 relative flex justify-between items-center pt-6 border-t border-gray-100">
+                    <p class="text-xs font-mono text-gray-400 uppercase">K9 Target Sectors</p>
+                    <p class="text-xs text-gray-500 font-medium italic">"We partner with those who want to lead culture, not just exist in it."</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-wrapper bg-gray-900">
+            <div class="slide-container p-16" style="background-color: #000000; color: #ffffff;">
+                <div class="absolute inset-0 z-0 pointer-events-none" style="background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px); background-size: 40px 40px;"></div>
+                <div class="bg-typo">NOW</div>
+                <div class="flex justify-between items-center w-full border-b border-gray-800 pb-4 mb-12 z-10 relative">
+                    <div><p class="text-xs text-gray-400 uppercase tracking-[0.2em] font-medium">K9 Productions</p></div>
+                    <div class="flex items-center space-x-2"><div class="h-2 w-2 bg-white rounded-full"></div><p class="text-xs text-white uppercase tracking-[0.2em] font-bold">The Shift</p></div>
+                </div>
+                <div class="flex flex-1 z-10 relative">
+                    <div class="w-1/3 flex flex-col justify-between pr-12">
+                        <div><h2 class="display-font text-8xl font-bold tracking-tighter leading-none mb-6">WHY<br/>NOW<span class="text-gray-600">?</span></h2><div class="w-12 h-1 bg-white mb-8"></div><p class="text-gray-400 text-lg leading-relaxed">The traditional agency model is too slow. The content factories are too generic. The gap is relevance.</p></div>
+                        <div class="mb-8"><p class="text-xs text-gray-500 uppercase tracking-widest mb-2">Market Velocity</p><div class="loading-bar-container"><div class="loading-bar"></div></div></div>
+                    </div>
+                    <div class="w-2/3 flex flex-col justify-center pl-12 border-l border-gray-800">
+                        <div class="statement-line group"><div class="flex items-center gap-4 mb-2 opacity-50 group-hover:opacity-100 transition-opacity"><i class="fa-solid fa-volume-xmark"></i><p class="text-xs uppercase tracking-widest">The Problem</p></div><h3 class="display-font text-4xl font-light leading-tight text-gray-300 group-hover:text-white transition-colors">Brands don't need more noise.<br/>They need <span class="highlight-word">relevance</span>.</h3></div>
+                        <div class="statement-line group"><div class="flex items-center gap-4 mb-2 opacity-50 group-hover:opacity-100 transition-opacity"><i class="fa-solid fa-code-branch"></i><p class="text-xs uppercase tracking-widest">The Insight</p></div><h3 class="display-font text-4xl font-light leading-tight text-gray-300 group-hover:text-white transition-colors">Algorithms change daily.<br/><span class="highlight-word">Culture</span> compounds.</h3></div>
+                        <div class="statement-line group"><div class="flex items-center gap-4 mb-2 opacity-50 group-hover:opacity-100 transition-opacity"><i class="fa-solid fa-bolt"></i><p class="text-xs uppercase tracking-widest">The Advantage</p></div><h3 class="display-font text-4xl font-bold leading-tight text-white">The moment favors teams that can<br/>think, make, and move — <span class="italic text-gray-400">fast</span>.</h3></div>
+                    </div>
+                </div>
+                <div class="z-10 relative flex justify-between items-center pt-6 border-t border-gray-800 mt-auto">
+                    <p class="text-xs font-mono text-gray-500 uppercase">2025 Outlook</p>
+                    <p class="text-xs text-gray-500 font-medium italic">"We believe in making trends, not following them."</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-wrapper bg-gray-50">
+            <div class="slide-container p-16" style="background-color: #ffffff; color: #000000;">
+                <div class="absolute inset-0 z-0 pointer-events-none" style="background-image: linear-gradient(#f3f4f6 1px, transparent 1px), linear-gradient(90deg, #f3f4f6 1px, transparent 1px); background-size: 40px 40px;"></div>
+                <div class="flex justify-between items-center w-full mb-12 z-10 relative">
+                    <div><p class="text-xs text-gray-500 uppercase tracking-[0.2em] font-medium">K9 Productions</p></div>
+                    <div class="flex items-center space-x-2"><div class="h-2 w-2 bg-black rounded-full"></div><p class="text-xs text-black uppercase tracking-[0.2em] font-bold">Partnership</p></div>
+                </div>
+                <div class="flex flex-col flex-1 z-10 relative">
+                    <div class="flex-1 flex flex-col justify-center">
+                        <div class="partner-badge"><i class="fa-solid fa-handshake mr-2"></i> Your Long-Term Creative Partner</div>
+                        <h1 class="display-font hero-title" style="font-size: 96px; line-height: 0.9; font-weight: 700; letter-spacing: -0.04em;">Build Brands People<br/>Actually <span class="hero-highlight" style="font-family: serif; font-style: italic; font-weight: 300; color: #4b5563;">Notice.</span></h1>
+                        <div class="flex gap-12 mt-4">
+                            <div class="max-w-md"><p class="text-xl text-gray-600 leading-relaxed font-light">Let’s create the work others reference. Consistent strategy, relentless craft, and measurable growth.</p></div>
+                            <div class="flex gap-8 border-l border-gray-200 pl-8"><div><p class="text-3xl font-bold font-serif italic text-black">100%</p><p class="text-xs text-gray-400 uppercase tracking-widest mt-1">Culture First</p></div><div><p class="text-3xl font-bold font-serif italic text-black">0%</p><p class="text-xs text-gray-400 uppercase tracking-widest mt-1">Generic Content</p></div></div>
+                        </div>
+                    </div>
+                    <div class="step-container">
+                        <div class="step-item"><div class="step-icon-white"><i class="fa-solid fa-phone"></i></div><span class="step-number">01</span><h3 class="step-title">Discovery Call</h3><p class="step-desc">We listen, learn your tension points, and identify the immediate opportunity.</p></div>
+                        <div class="flex items-center justify-center pt-10 text-gray-300"><i class="fa-solid fa-arrow-right"></i></div>
+                        <div class="step-item"><div class="step-icon-white"><i class="fa-solid fa-file-signature"></i></div><span class="step-number">02</span><h3 class="step-title">Scope &amp; Sprint</h3><p class="step-desc">We define a clear path. No bloat, just the deliverables that move the needle.</p></div>
+                        <div class="flex items-center justify-center pt-10 text-gray-300"><i class="fa-solid fa-arrow-right"></i></div>
+                        <div class="step-item"><div class="step-icon-white"><i class="fa-solid fa-rocket"></i></div><span class="step-number">03</span><h3 class="step-title">Ship Fast</h3><p class="step-desc">Execution begins immediately. We value speed and quality equally.</p></div>
+                        <div class="flex items-center justify-center pt-10 text-gray-300"><i class="fa-solid fa-arrow-right"></i></div>
+                        <div class="step-item"><div class="step-icon-white"><i class="fa-solid fa-chart-line"></i></div><span class="step-number">04</span><h3 class="step-title">Scale</h3><p class="step-desc">We measure impact, iterate on what works, and compound the growth.</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-wrapper bg-gray-50">
+            <div class="slide-container p-16" style="background-color: #ffffff; color: #000000;">
+                <div class="absolute inset-0 z-0 pointer-events-none" style="background-image: linear-gradient(#f3f4f6 1px, transparent 1px), linear-gradient(90deg, #f3f4f6 1px, transparent 1px); background-size: 40px 40px;"></div>
+                <div class="flex justify-between items-center w-full mb-12 z-10 relative">
+                    <div><p class="text-xs text-gray-500 uppercase tracking-[0.2em] font-medium">K9 Productions</p></div>
+                    <div class="flex items-center space-x-2"><div class="h-2 w-2 bg-black rounded-full"></div><p class="text-xs text-black uppercase tracking-[0.2em] font-bold">Contact</p></div>
+                </div>
+                <div class="flex flex-col flex-1 z-10 relative justify-center">
+                    <div class="mb-16"><h1 class="display-font hero-text text-center" style="font-size: 140px; font-weight: 700; line-height: 0.9; letter-spacing: -0.05em; color: #111827;">Let's Talk<span class="hero-period" style="color: #4b5563;">.</span></h1><p class="text-center text-xl text-gray-500 mt-6 font-light max-w-2xl mx-auto">Ready to stop chasing trends and start making them? Reach out to start your project.</p></div>
+                    <div class="grid grid-cols-3 gap-8 w-full max-w-5xl mx-auto">
+                        <div class="contact-card"><div><div class="icon-circle-contact"><i class="fa-solid fa-envelope"></i></div><p class="label">Inquiries</p><p class="value" style="font-size: 18px;">choudharysambhav5@gmail.com</p></div></div>
+                        <div class="contact-card"><div><div class="icon-circle-contact"><i class="fa-solid fa-phone"></i></div><p class="label">Call Us</p><p class="value" style="font-size: 18px;">+91 8865031442</p></div></div>
+                        <div class="contact-card"><div><div class="icon-circle-contact"><i class="fa-solid fa-location-dot"></i></div><p class="label">Studio</p><p class="value">Noida, India</p></div></div>
+                    </div>
+                    <div class="text-center mt-12"><div class="flex justify-center gap-8"><a class="text-gray-400 hover:text-black transition-colors font-medium text-sm uppercase tracking-widest" href="#">Instagram</a><a class="text-gray-400 hover:text-black transition-colors font-medium text-sm uppercase tracking-widest" href="#">LinkedIn</a></div></div>
+                </div>
+                <div class="footer-line z-10 relative"><p class="text-xs font-mono text-gray-400 uppercase">© 2025 K9 Productions</p><p class="text-xs text-gray-500 font-medium italic">"We believe in making trends, not following them."</p></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Slide Navigation Logic
+        const slides = document.querySelectorAll('.slide-wrapper');
+        const counterElement = document.getElementById('current-slide-num');
+        let currentSlide = 0;
+
+        function showSlide(index) {
+            // Bounds check
+            if (index < 0) index = 0;
+            if (index >= slides.length) index = slides.length - 1;
+
+            // Hide all slides
+            slides.forEach(slide => {
+                slide.classList.remove('active');
+            });
+
+            // Show active slide
+            slides[index].classList.add('active');
+            
+            // Update counter
+            currentSlide = index;
+            counterElement.textContent = currentSlide + 1;
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            showSlide(currentSlide - 1);
+        }
+
+        // Initialize
+        showSlide(0);
+
+        // Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+    </script>
+</body>
+</html>
